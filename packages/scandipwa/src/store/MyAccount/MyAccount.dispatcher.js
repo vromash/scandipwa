@@ -11,6 +11,9 @@
 
 import MyAccountQuery from 'Query/MyAccount.query';
 import {
+    STATUS_PASSWORD_UPDATED
+} from 'Route/PasswordChangePage/PasswordChangePage.config';
+import {
     updateCustomerDetails,
     updateCustomerIsAuthTokenExpired,
     updateCustomerPasswordForgotStatus,
@@ -115,10 +118,26 @@ export class MyAccountDispatcher {
 
         return fetchMutation(mutation).then(
             /** @namespace Store/MyAccount/Dispatcher/resetPasswordFetchMutationThen */
-            ({ resetPassword: { status } }) => dispatch(updateCustomerPasswordResetStatus(status)),
+            ({ resetPassword }) => {
+                if (resetPassword) {
+                    return dispatch(updateCustomerPasswordResetStatus(STATUS_PASSWORD_UPDATED));
+                }
+
+                return dispatch(updateCustomerPasswordResetStatus(resetPassword));
+            },
             /** @namespace Store/MyAccount/Dispatcher/resetPasswordFetchMutationError */
             () => dispatch(updateCustomerPasswordResetStatus('error'))
         );
+    }
+
+    /**
+     * Update customer password reset status action
+     * @param {{status: String}} [options={}]
+     * @memberof MyAccountDispatcher
+     */
+    updateCustomerPasswordResetStatus(options = {}, dispatch) {
+        const { status } = options;
+        return dispatch(updateCustomerPasswordResetStatus(status));
     }
 
     /**

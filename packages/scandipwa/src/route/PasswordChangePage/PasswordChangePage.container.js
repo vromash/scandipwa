@@ -73,6 +73,7 @@ export class PasswordChangePageContainer extends PureComponent {
             PropTypes.bool
         ]).isRequired,
         resetPassword: PropTypes.func.isRequired,
+        updateCustomerPasswordResetStatus: PropTypes.func.isRequired,
         location: LocationType.isRequired
     };
 
@@ -121,11 +122,17 @@ export class PasswordChangePageContainer extends PureComponent {
     };
 
     onPasswordSuccess(fields) {
-        const { resetPassword, location } = this.props;
-        const { passwordReset: password, passwordResetConfirm: password_confirmation } = fields;
+        const { resetPassword, location, updateCustomerPasswordResetStatus } = this.props;
+        const { passwordReset: password, passwordResetConfirm: passwordConfirmation } = fields;
         const token = getQueryParam('token', location);
+        // TODO: add email resolver
+        const email = '';
 
-        resetPassword({ token, password, password_confirmation });
+        if (password !== passwordConfirmation) {
+            updateCustomerPasswordResetStatus(STATUS_PASSWORD_MISS_MATCH);
+        } else {
+            resetPassword({ email, token, password });
+        }
     }
 
     onPasswordAttempt() {
